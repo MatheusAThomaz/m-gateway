@@ -1,5 +1,6 @@
 package com.mthomaz.mgateway.config
 
+import com.mthomaz.mgateway.config.repository.RedisRouteDefinitionRepository
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cloud.gateway.route.RouteDefinition

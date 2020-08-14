@@ -26,6 +26,8 @@ dependencies {
 	implementation("org.springframework.cloud:spring-cloud-starter-gateway")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+	implementation("io.github.microutils:kotlin-logging:1.6.26")
+
 	compile("org.springframework.boot:spring-boot-starter-data-redis:2.2.5.RELEASE")
 	compile("redis.clients:jedis:3.1.0")
 }

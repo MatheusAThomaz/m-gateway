@@ -1,5 +1,7 @@
 package com.mthomaz.mgateway.config.repository
 
+import mu.KLogger
+import mu.KotlinLogging
 import org.springframework.cloud.gateway.route.RouteDefinition
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository
 import org.springframework.data.redis.core.ReactiveRedisTemplate
@@ -7,10 +9,13 @@ import org.springframework.data.redis.core.ReactiveValueOperations
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Mono.empty
 import java.util.function.BiConsumer
 
 @Repository
-class RedisRouteDefinitionRepository(private val reactiveRedisTemplate: ReactiveRedisTemplate<String?, RouteDefinition?>?) : RouteDefinitionRepository {
+class RedisRouteDefinitionRepository(
+        private val reactiveRedisTemplate: ReactiveRedisTemplate<String?, RouteDefinition?>?,
+        private val log: KLogger = KotlinLogging.logger {}) : RouteDefinitionRepository {
 
     private val ROUTEDEFINITION_REDIS_KEY_PREFIX_QUERY = "routedefinition_"
 
@@ -22,18 +27,18 @@ class RedisRouteDefinitionRepository(private val reactiveRedisTemplate: Reactive
     }
 
 
-    override fun save(route: Mono<RouteDefinition>?): Mono<Void> {
-        if (routeDefinitionReactiveValueOperations != null) {
-            route!!.flatMap { routeDefinition ->
+    override fun save(route: Mono<RouteDefinition>): Mono<Void> {
 
-                routeDefinitionReactiveValueOperations
-                        .set(createKey(routeDefinition.id), routeDefinition)
+            return route.flatMap { routeDefinition ->
+
+                val id = createKey(routeDefinition.id)
+
+                log.info { "id = $id" }
+
+                return@flatMap routeDefinitionReactiveValueOperations?.set(id , routeDefinition)?.then()
 
             }
-        }
 
-        //TODO REMOVE THIS MONO
-        return Mono.empty()
     }
 
     override fun getRouteDefinitions(): Flux<RouteDefinition?> {

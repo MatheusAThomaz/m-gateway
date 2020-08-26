@@ -64,6 +64,10 @@ class GatewayLogFilter(
         return header
     }
 
+    override fun getConfigClass(): Class<Config> {
+        return Config::class.java
+    }
+
     override fun newConfig(): Config {
         return Config(GatewayLogFilter::class.simpleName)
     }

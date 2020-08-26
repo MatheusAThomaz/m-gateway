@@ -44,7 +44,7 @@ class RedisRouteDefinitionRepository(
     override fun getRouteDefinitions(): Flux<RouteDefinition?> {
         return reactiveRedisTemplate!!.keys(createKey("*"))
                 .flatMap { key: Any? -> reactiveRedisTemplate.opsForValue()[key!!] }
-                .onErrorContinue(BiConsumer { throwable: Any, routeDefinition: Any? ->
+                .onErrorContinue(BiConsumer { _: Any, _: Any? ->
                 })
     }
 

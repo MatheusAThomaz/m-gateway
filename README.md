@@ -1,2 +1,0 @@
-# m-gateway
-API Gateway

@@ -4,6 +4,7 @@ import mu.KLogger
 import mu.KotlinLogging
 import org.springframework.cloud.gateway.route.RouteDefinition
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository
+import org.springframework.context.annotation.Bean
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.data.redis.core.ReactiveValueOperations
 import org.springframework.stereotype.Repository
@@ -11,6 +12,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Mono.empty
 import java.util.function.BiConsumer
+
 
 @Repository
 class RedisRouteDefinitionRepository(
@@ -41,11 +43,26 @@ class RedisRouteDefinitionRepository(
 
     }
 
+
+
     override fun getRouteDefinitions(): Flux<RouteDefinition?> {
+
         return reactiveRedisTemplate!!.keys(createKey("*"))
                 .flatMap { key: Any? -> reactiveRedisTemplate.opsForValue()[key!!] }
                 .onErrorContinue(BiConsumer { _: Any, _: Any? ->
                 })
+    }
+
+    @Bean
+    fun refresh() {
+
+            reactiveRedisTemplate!!.keys(createKey("*"))
+                    .flatMap { key: Any? ->  reactiveRedisTemplate.opsForValue()[key!!].map {
+                        it?.let { it1 -> routeDefinitionReactiveValueOperations!!.set(key.toString(), it1).then() }
+                    } }
+                    .onErrorContinue(BiConsumer { _: Any, _: Any? ->
+                    })
+
     }
 
     override fun delete(routeId: Mono<String>?): Mono<Void> {
